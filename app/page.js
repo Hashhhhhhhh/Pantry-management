@@ -176,7 +176,7 @@ export default function Home() {
 
       <Box 
         width="100%"
-        maxWidth="800px"
+        maxWidth="600px" // Reduced the width
         borderRadius={2}
         overflow="hidden"
         boxShadow={3}
@@ -185,21 +185,21 @@ export default function Home() {
       >
         <Box
           width="100%"
-          height="80px"
+          height="60px" // Reduced the height of the header
           bgcolor={"#333"}
           display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
           borderBottom={"1px solid #444"}
         >
-          <Typography variant={"h4"} color={"#FFC0CB"} textAlign={"center"}>
+          <Typography variant={"h5"} color={"#FFC0CB"} textAlign={"center"}>
             P A N T R Y  -  I T E M S 
           </Typography>
         </Box>
         <Box
           width="100%"
-          maxHeight="300px" // Limit height to enable scrolling
-          overflowY="auto" // Enable vertical scrolling
+          maxHeight="200px" // Smaller height for the item list
+          overflowY="auto"
         >
           <Stack width="100%" spacing={2} padding={2}>
             {filteredPantry.map(({ name, count }) => (
@@ -246,5 +246,4 @@ export default function Home() {
     </Box>
   );
 }
-
 
