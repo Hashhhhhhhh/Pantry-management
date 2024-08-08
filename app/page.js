@@ -10,14 +10,14 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 350, // Reduced width of the modal
   bgcolor: 'black',
   border: '2px solid #FFC0CB',
   boxShadow: 24,
-  p: 4,
+  p: 3, // Reduced padding
   display: "flex",
   flexDirection: "column",
-  gap: 3
+  gap: 2 // Reduced gap between elements
 };
 
 export default function Home() {
@@ -25,7 +25,7 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState("");
   const [itemQuantity, setItemQuantity] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -79,7 +79,6 @@ export default function Home() {
     await updatePantry();
   };
 
-  // Filter pantry items based on search query
   const filteredPantry = pantry.filter(({ name }) => 
     name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -92,15 +91,15 @@ export default function Home() {
       justifyContent={"center"}
       alignItems={"center"}
       flexDirection={"column"}
-      gap={3}
+      gap={2}
       bgcolor={"#1E1E1E"}
       color={"#E0E0E0"}
-      p={4}
+      p={3}
     >
       <Typography
-        variant="h2"
+        variant="h4" // Reduced font size
         color={"#FFC0CB"}
-        marginBottom={3}
+        marginBottom={2}
         sx={{ fontFamily: 'Times New Roman, serif' }}
       >
         WELCOME TO PANTRY TRACKER!
@@ -110,7 +109,7 @@ export default function Home() {
         variant="contained" 
         color="secondary" 
         onClick={handleOpen} 
-        sx={{ marginBottom: 3 }}
+        sx={{ marginBottom: 2 }}
       >
         Add Item
       </Button>
@@ -125,7 +124,7 @@ export default function Home() {
           <Typography id="modal-modal-title" variant="h6" component="h2" color="white">
             Add Item
           </Typography>
-          <Stack direction={"row"} width="100%" spacing={2}>
+          <Stack direction={"row"} width="100%" spacing={1}>
             <TextField
               id="outlined-basic"
               label="Item"
@@ -145,7 +144,7 @@ export default function Home() {
               onChange={(e) => setItemQuantity(parseInt(e.target.value))}
               InputProps={{ style: { color: 'white' } }}
               InputLabelProps={{ style: { color: 'white' } }}
-              sx={{ maxWidth: "100px" }}
+              sx={{ maxWidth: "80px" }} // Reduced width
             />
             <Button 
               variant="contained" 
@@ -171,37 +170,35 @@ export default function Home() {
         onChange={(e) => setSearchQuery(e.target.value)}
         InputProps={{ style: { color: 'white' } }}
         InputLabelProps={{ style: { color: 'white' } }}
-        sx={{ marginBottom: 3, maxWidth: "800px" }}
+        sx={{ marginBottom: 2, maxWidth: "600px" }} // Reduced max width
       />
 
       <Box 
         width="100%"
-        maxWidth="600px" // Reduced the width
+        maxWidth="600px" // Reduced width
         borderRadius={2}
-        overflow="hidden"
         boxShadow={3}
         bgcolor={"#2C2C2C"}
         p={2}
       >
         <Box
           width="100%"
-          height="60px" // Reduced the height of the header
+          height="50px" // Reduced header height
           bgcolor={"#333"}
           display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
           borderBottom={"1px solid #444"}
         >
-          <Typography variant={"h5"} color={"#FFC0CB"} textAlign={"center"}>
-            P A N T R Y  -  I T E M S 
+          <Typography variant={"h6"} color={"#FFC0CB"} textAlign={"center"}>
+            PANTRY ITEMS
           </Typography>
         </Box>
         <Box
           width="100%"
-          maxHeight="200px" // Smaller height for the item list
-          overflowY="auto"
+          padding={1} // Reduced padding for items
         >
-          <Stack width="100%" spacing={2} padding={2}>
+          <Stack width="100%" spacing={1}>
             {filteredPantry.map(({ name, count }) => (
               <Box
                 key={name}
@@ -210,25 +207,25 @@ export default function Home() {
                 justifyContent={"space-between"}
                 alignItems={"center"}
                 bgcolor={"#3C3C3C"}
-                padding={2}
+                padding={1} // Reduced padding for items
                 borderRadius={1}
                 boxShadow={1}
               >
                 <Typography 
-                  variant={"h6"} 
+                  variant={"body1"} // Reduced font size
                   color={"#E0E0E0"} 
                   sx={{ fontFamily: 'Comic Sans MS, cursive' }}
                 >
                   {name.charAt(0).toUpperCase() + name.slice(1)}
                 </Typography>
-                <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                <Stack direction={"row"} alignItems={"center"} spacing={1}>
                   <TextField
                     type="number"
                     value={count}
                     onChange={(e) => changeItemQuantity(name, parseInt(e.target.value))}
                     InputProps={{ style: { color: 'white' } }}
                     InputLabelProps={{ style: { color: 'white' } }}
-                    sx={{ width: "60px" }}
+                    sx={{ width: "50px" }} // Reduced width
                   />
                   <Button 
                     variant="contained" 
@@ -246,4 +243,5 @@ export default function Home() {
     </Box>
   );
 }
+
 
