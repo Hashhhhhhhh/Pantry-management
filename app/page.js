@@ -21,51 +21,61 @@ const style = {
 };
 
 export default function Home() {
-  const [pantry, setPantry] = useState([])
+  const [pantry, setPantry] = useState([]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [itemName, setItemName] = useState("")
+  const [itemName, setItemName] = useState("");
+  const [itemQuantity, setItemQuantity] = useState(1); // New state for quantity
 
   const updatePantry = async () => {
-    const snapshot = query(collection(firestore, "pantry"))
-    const docs = await getDocs(snapshot)
-    const pantryList = []
+    const snapshot = query(collection(firestore, "pantry"));
+    const docs = await getDocs(snapshot);
+    const pantryList = [];
     docs.forEach((doc) => {
-      pantryList.push({ name: doc.id, ...doc.data() })
-    })
-    setPantry(pantryList)
-  }
+      pantryList.push({ name: doc.id, ...doc.data() });
+    });
+    setPantry(pantryList);
+  };
 
   useEffect(() => {
-    updatePantry()
-  }, [])
+    updatePantry();
+  }, []);
 
-  const addItem = async (item) => {
-    const docRef = await doc(collection(firestore, "pantry"), item)
-    const docSnap = await getDoc(docRef)
+  const addItem = async (item, quantity) => {
+    const docRef = await doc(collection(firestore, "pantry"), item);
+    const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      const { count } = docSnap.data()
-      await setDoc(docRef, { count: count + 1 })
+      const { count } = docSnap.data();
+      await setDoc(docRef, { count: count + quantity });
     } else {
-      await setDoc(docRef, { count: 1 })
+      await setDoc(docRef, { count: quantity });
     }
-    await updatePantry()
-  }
+    await updatePantry();
+  };
+
+  const changeItemQuantity = async (item, newQuantity) => {
+    const docRef = doc(collection(firestore, "pantry"), item);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      await setDoc(docRef, { count: newQuantity });
+    }
+    await updatePantry();
+  };
 
   const removeItem = async (item) => {
-    const docRef = doc(collection(firestore, "pantry"), item)
-    const docSnap = await getDoc(docRef)
+    const docRef = doc(collection(firestore, "pantry"), item);
+    const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      const { count } = docSnap.data()
+      const { count } = docSnap.data();
       if (count === 1) {
-        await deleteDoc(docRef)
+        await deleteDoc(docRef);
       } else {
-        await setDoc(docRef, { count: count - 1 })
+        await setDoc(docRef, { count: count - 1 });
       }
     }
-    await updatePantry()
-  }
+    await updatePantry();
+  };
 
   return (
     <Box
@@ -76,15 +86,15 @@ export default function Home() {
       alignItems={"center"}
       flexDirection={"column"}
       gap={3}
-      bgcolor={"#1E1E1E"} // Dark background color
-      color={"#E0E0E0"} // Light text color
+      bgcolor={"#1E1E1E"}
+      color={"#E0E0E0"}
       p={4}
     >
       <Typography
         variant="h2"
         color={"#FFC0CB"}
         marginBottom={3}
-        sx={{ fontFamily: 'Times New Roman, serif' }} // Set font to Times New Roman
+        sx={{ fontFamily: 'Times New Roman, serif' }}
       >
         WELCOME TO PANTRY TRACKER!
       </Typography>
@@ -116,16 +126,28 @@ export default function Home() {
               fullWidth
               value={itemName}
               onChange={(e) => setItemName(e.target.value)}
-              InputProps={{ style: { color: 'white' } }} // Set input text color
-              InputLabelProps={{ style: { color: 'white' } }} // Set input label color
+              InputProps={{ style: { color: 'white' } }}
+              InputLabelProps={{ style: { color: 'white' } }}
+            />
+            <TextField
+              id="outlined-quantity"
+              label="Quantity"
+              type="number"
+              variant="outlined"
+              value={itemQuantity}
+              onChange={(e) => setItemQuantity(parseInt(e.target.value))}
+              InputProps={{ style: { color: 'white' } }}
+              InputLabelProps={{ style: { color: 'white' } }}
+              sx={{ maxWidth: "100px" }}
             />
             <Button 
               variant="contained" 
               color="secondary"
               onClick={() => {
-                addItem(itemName)
-                setItemName("")
-                handleClose()
+                addItem(itemName, itemQuantity);
+                setItemName("");
+                setItemQuantity(1);
+                handleClose();
               }}
             > 
               Add
@@ -146,7 +168,7 @@ export default function Home() {
         <Box
           width="100%"
           height="80px"
-          bgcolor={"#333"} // Darker background for header
+          bgcolor={"#333"}
           display={"flex"}
           justifyContent={"center"}
           alignItems={"center"}
@@ -172,24 +194,27 @@ export default function Home() {
               <Typography 
                 variant={"h6"} 
                 color={"#E0E0E0"} 
-                sx={{ fontFamily: 'Comic Sans MS, cursive' }} // Set font to Comic Sans for item names
+                sx={{ fontFamily: 'Comic Sans MS, cursive' }}
               >
                 {name.charAt(0).toUpperCase() + name.slice(1)}
               </Typography>
-              <Typography 
-                variant={"body1"} 
-                color={"#E0E0E0"} 
-                sx={{ fontFamily: 'Comic Sans MS, cursive' }} // Set font to Comic Sans for item quantities
-              >
-                Quantity: {count}
-              </Typography>
-              <Button 
-                variant="contained" 
-                color="error" 
-                onClick={() => removeItem(name)}
-              >
-                Remove
-              </Button>
+              <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                <TextField
+                  type="number"
+                  value={count}
+                  onChange={(e) => changeItemQuantity(name, parseInt(e.target.value))}
+                  InputProps={{ style: { color: 'white' } }}
+                  InputLabelProps={{ style: { color: 'white' } }}
+                  sx={{ width: "60px" }}
+                />
+                <Button 
+                  variant="contained" 
+                  color="error" 
+                  onClick={() => removeItem(name)}
+                >
+                  Remove
+                </Button>
+              </Stack>
             </Box>
           ))}
         </Stack>
@@ -197,3 +222,4 @@ export default function Home() {
     </Box>
   );
 }
+
