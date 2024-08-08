@@ -1,6 +1,6 @@
 "use client"
-import { Box, Typography, Button, Modal, TextField } from "@mui/material"
-import { Stack } from "@mui/material"
+import { Box, Typography, Button, Modal, TextField } from "@mui/material";
+import { Stack } from "@mui/material";
 import { firestore } from "@/firebase";
 import { collection, query, getDocs, doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -23,10 +23,12 @@ const style = {
 export default function Home() {
   const [pantry, setPantry] = useState([]);
   const [open, setOpen] = useState(false);
+  const [itemName, setItemName] = useState("");
+  const [itemQuantity, setItemQuantity] = useState(1);
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [itemName, setItemName] = useState("");
-  const [itemQuantity, setItemQuantity] = useState(1); // New state for quantity
 
   const updatePantry = async () => {
     const snapshot = query(collection(firestore, "pantry"));
@@ -76,6 +78,11 @@ export default function Home() {
     }
     await updatePantry();
   };
+
+  // Filter pantry items based on search query
+  const filteredPantry = pantry.filter(({ name }) => 
+    name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <Box
@@ -156,6 +163,17 @@ export default function Home() {
         </Box>
       </Modal>
 
+      <TextField
+        label="Search Items"
+        variant="outlined"
+        fullWidth
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        InputProps={{ style: { color: 'white' } }}
+        InputLabelProps={{ style: { color: 'white' } }}
+        sx={{ marginBottom: 3, maxWidth: "800px" }}
+      />
+
       <Box 
         width="100%"
         maxWidth="800px"
@@ -178,48 +196,55 @@ export default function Home() {
             P A N T R Y  -  I T E M S 
           </Typography>
         </Box>
-        <Stack width="100%" spacing={2} padding={2}>
-          {pantry.map(({ name, count }) => (
-            <Box
-              key={name}
-              width="100%"
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              bgcolor={"#3C3C3C"}
-              padding={2}
-              borderRadius={1}
-              boxShadow={1}
-            >
-              <Typography 
-                variant={"h6"} 
-                color={"#E0E0E0"} 
-                sx={{ fontFamily: 'Comic Sans MS, cursive' }}
+        <Box
+          width="100%"
+          maxHeight="300px" // Limit height to enable scrolling
+          overflowY="auto" // Enable vertical scrolling
+        >
+          <Stack width="100%" spacing={2} padding={2}>
+            {filteredPantry.map(({ name, count }) => (
+              <Box
+                key={name}
+                width="100%"
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                bgcolor={"#3C3C3C"}
+                padding={2}
+                borderRadius={1}
+                boxShadow={1}
               >
-                {name.charAt(0).toUpperCase() + name.slice(1)}
-              </Typography>
-              <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                <TextField
-                  type="number"
-                  value={count}
-                  onChange={(e) => changeItemQuantity(name, parseInt(e.target.value))}
-                  InputProps={{ style: { color: 'white' } }}
-                  InputLabelProps={{ style: { color: 'white' } }}
-                  sx={{ width: "60px" }}
-                />
-                <Button 
-                  variant="contained" 
-                  color="error" 
-                  onClick={() => removeItem(name)}
+                <Typography 
+                  variant={"h6"} 
+                  color={"#E0E0E0"} 
+                  sx={{ fontFamily: 'Comic Sans MS, cursive' }}
                 >
-                  Remove
-                </Button>
-              </Stack>
-            </Box>
-          ))}
-        </Stack>
+                  {name.charAt(0).toUpperCase() + name.slice(1)}
+                </Typography>
+                <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                  <TextField
+                    type="number"
+                    value={count}
+                    onChange={(e) => changeItemQuantity(name, parseInt(e.target.value))}
+                    InputProps={{ style: { color: 'white' } }}
+                    InputLabelProps={{ style: { color: 'white' } }}
+                    sx={{ width: "60px" }}
+                  />
+                  <Button 
+                    variant="contained" 
+                    color="error" 
+                    onClick={() => removeItem(name)}
+                  >
+                    Remove
+                  </Button>
+                </Stack>
+              </Box>
+            ))}
+          </Stack>
+        </Box>
       </Box>
     </Box>
   );
 }
+
 
